@@ -60,4 +60,15 @@ public class LikeablePersonController {
 
         return "usr/likeablePerson/list";
     }
+
+    @GetMapping("/delete/{id}")
+    public String delete(Model model, @PathVariable Long id) {
+        RsData<LikeablePerson> createRsData = likeablePersonService.delete(rq.getMember(), id);
+
+        if (createRsData.isFail()) {
+            return rq.historyBack(createRsData);
+        }
+
+        return rq.redirectWithMsg("/likeablePerson/list", createRsData);
+    }
 }

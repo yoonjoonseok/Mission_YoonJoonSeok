@@ -49,4 +49,20 @@ public class LikeablePersonService {
     public List<LikeablePerson> findByFromInstaMemberId(Long fromInstaMemberId) {
         return likeablePersonRepository.findByFromInstaMemberId(fromInstaMemberId);
     }
+
+    @Transactional
+    public RsData<LikeablePerson> delete(Member member, Long id){
+        Optional<LikeablePerson> likeablePerson = likeablePersonRepository.findById(Math.toIntExact(id));
+
+        if(likeablePerson == null){
+            return RsData.of("F-1", "존재하지 않는 id입니다.");
+        }
+        if(likeablePerson.get().getFromInstaMember() != member.getInstaMember()){
+            return RsData.of("F-2", "본인이 아닙니다.");
+        }
+
+        likeablePersonRepository.delete(likeablePerson.get());
+
+        return RsData.of("S-1", "호감상대로 등록한 %s 삭제 완료.".formatted(likeablePerson.get().getToInstaMember().getUsername()));
+    }
 }
