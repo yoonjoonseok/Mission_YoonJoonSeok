@@ -52,7 +52,7 @@ public class LikeablePersonService {
 
     @Transactional
     public RsData<LikeablePerson> delete(Member member, Long id){
-        Optional<LikeablePerson> likeablePerson = likeablePersonRepository.findById(Math.toIntExact(id));
+        Optional<LikeablePerson> likeablePerson = likeablePersonRepository.findById(id);
 
         if(likeablePerson == null){
             return RsData.of("F-1", "존재하지 않는 id입니다.");
