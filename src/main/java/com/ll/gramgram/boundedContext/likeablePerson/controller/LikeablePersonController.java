@@ -64,7 +64,7 @@ public class LikeablePersonController {
 
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}")
-    public String delete(Model model, @PathVariable Long id) {
+    public String delete(@PathVariable Long id) {
         RsData<LikeablePerson> createRsData = likeablePersonService.delete(rq.getMember(), id);
 
         if (createRsData.isFail()) {
