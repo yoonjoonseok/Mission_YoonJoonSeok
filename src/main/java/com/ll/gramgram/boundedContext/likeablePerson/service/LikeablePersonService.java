@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -50,19 +51,24 @@ public class LikeablePersonService {
         return likeablePersonRepository.findByFromInstaMemberId(fromInstaMemberId);
     }
 
+    public Optional<LikeablePerson> findById(Long id) {
+        return likeablePersonRepository.findById(id);
+    }
+
     @Transactional
-    public RsData<LikeablePerson> delete(Member member, Long id){
-        Optional<LikeablePerson> likeablePerson = likeablePersonRepository.findById(id);
+    public RsData delete(LikeablePerson likeablePerson) {
+        String toInstaMemberUsername = likeablePerson.getToInstaMember().getUsername();
+        likeablePersonRepository.delete(likeablePerson);
 
-        if(likeablePerson == null){
-            return RsData.of("F-1", "존재하지 않는 id입니다.");
-        }
-        if(likeablePerson.get().getFromInstaMember() != member.getInstaMember()){
-            return RsData.of("F-2", "본인이 아닙니다.");
-        }
+        return RsData.of("S-1", "%s님에 대한 호감을 취소하였습니다.".formatted(toInstaMemberUsername));
+    }
 
-        likeablePersonRepository.delete(likeablePerson.get());
+    public RsData canActorDelete(Member member, LikeablePerson likeablePerson) {
+        if (likeablePerson == null) return RsData.of("F-1", "존재하지 않는 호감상태입니다.");
 
-        return RsData.of("S-1", "호감상대로 등록한 %s 삭제 완료.".formatted(likeablePerson.get().getToInstaMember().getUsername()));
+        if (!Objects.equals(member.getInstaMember().getId(), likeablePerson.getFromInstaMember().getId()))
+            return RsData.of("F-2", "권한이 없습니다.");
+
+        return RsData.of("S-1", "삭제 가능합니다.");
     }
 }
