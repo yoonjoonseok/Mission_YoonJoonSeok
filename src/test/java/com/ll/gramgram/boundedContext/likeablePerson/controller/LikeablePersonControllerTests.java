@@ -267,4 +267,25 @@ public class LikeablePersonControllerTests {
                 .andExpect(status().is4xxClientError())
         ;
     }
+
+    @Test
+    @DisplayName("등록 폼 처리(기존의 사유와 다른 사유로 호감을 표시하는 경우에는 성공으로 처리)")
+    @WithUserDetails("user3")
+    void t011() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(post("/likeablePerson/add")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("username", "insta_user4")
+                        .param("attractiveTypeCode", "2")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("add"))
+                .andExpect(status().is3xxRedirection())
+        ;
+    }
 }
