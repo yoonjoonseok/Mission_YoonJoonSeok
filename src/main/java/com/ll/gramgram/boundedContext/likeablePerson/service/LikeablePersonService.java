@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -70,11 +69,11 @@ public class LikeablePersonService {
         return RsData.of("S-1", "%s님에 대한 호감을 취소하였습니다.".formatted(toInstaMemberUsername));
     }
 
-    public RsData canActorDelete(Member member, LikeablePerson likeablePerson) {
+    public RsData canActorDelete(Member actor, LikeablePerson likeablePerson) {
         if (likeablePerson == null) return RsData.of("F-1", "존재하지 않는 호감상태입니다.");
 
         // 수행자의 인스타계정 번호
-        long actorInstaMemberId = member.getInstaMember().getId();
+        long actorInstaMemberId = actor.getInstaMember().getId();
         // 삭제 대상의 작성자(호감표시한 사람)의 인스타계정 번호
         long fromInstaMemberId = likeablePerson.getFromInstaMember().getId();
 
@@ -82,5 +81,18 @@ public class LikeablePersonService {
             return RsData.of("F-2", "권한이 없습니다.");
 
         return RsData.of("S-1", "삭제 가능합니다.");
+    }
+
+    public RsData canActorCreate(Member actor, String username, int attractiveTypeCode) {
+        InstaMember instaMember = instaMemberService.findByUsername(actor.getInstaMember().getUsername()).orElse(null);
+
+        List<LikeablePerson> LikeablePersonList = instaMember.getFromLikeablePeople();
+
+        for(LikeablePerson likeablePerson:LikeablePersonList){
+            if(likeablePerson.getToInstaMemberUsername().equals(username))
+                return RsData.of("F-1", "중복입니다.");
+        }
+
+        return RsData.of("S-1", "추가 가능합니다.");
     }
 }
