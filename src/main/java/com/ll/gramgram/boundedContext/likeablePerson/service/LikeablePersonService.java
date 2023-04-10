@@ -73,7 +73,12 @@ public class LikeablePersonService {
     public RsData canActorDelete(Member member, LikeablePerson likeablePerson) {
         if (likeablePerson == null) return RsData.of("F-1", "존재하지 않는 호감상태입니다.");
 
-        if (!Objects.equals(member.getInstaMember().getId(), likeablePerson.getFromInstaMember().getId()))
+        // 수행자의 인스타계정 번호
+        long actorInstaMemberId = member.getInstaMember().getId();
+        // 삭제 대상의 작성자(호감표시한 사람)의 인스타계정 번호
+        long fromInstaMemberId = likeablePerson.getFromInstaMember().getId();
+
+        if (actorInstaMemberId != fromInstaMemberId)
             return RsData.of("F-2", "권한이 없습니다.");
 
         return RsData.of("S-1", "삭제 가능합니다.");
