@@ -88,6 +88,9 @@ public class LikeablePersonService {
 
         List<LikeablePerson> LikeablePersonList = instaMember.getFromLikeablePeople();
 
+        if(LikeablePersonList.size() >= 10)
+            return RsData.of("F-2", "한 명이 11개 이상 등록할 수 없습니다.");
+
         for(LikeablePerson likeablePerson:LikeablePersonList){
             if(likeablePerson.getToInstaMemberUsername().equals(username))
                 return RsData.of("F-1", "중복입니다.");
