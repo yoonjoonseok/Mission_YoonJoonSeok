@@ -43,6 +43,14 @@ public class LikeablePersonController {
 
         if (canActorDeleteRsData.isFail()) {
             return rq.historyBack(canActorDeleteRsData);
+        } else if (canActorDeleteRsData.getResultCode().equals("S-2")) {
+            RsData updateRsData = likeablePersonService.update((LikeablePerson) canActorDeleteRsData.getData(), addForm.getAttractiveTypeCode());
+
+            if (updateRsData.isFail()) {
+                return rq.historyBack(updateRsData);
+            }
+
+            return rq.redirectWithMsg("/likeablePerson/list", updateRsData);
         }
 
         RsData<LikeablePerson> createRsData = likeablePersonService.like(rq.getMember(), addForm.getUsername(), addForm.getAttractiveTypeCode());
@@ -80,7 +88,7 @@ public class LikeablePersonController {
 
         RsData deleteRsData = likeablePersonService.delete(likeablePerson);
 
-        if (deleteRsData .isFail()) return rq.historyBack(deleteRsData);
+        if (deleteRsData.isFail()) return rq.historyBack(deleteRsData);
 
         return rq.redirectWithMsg("/likeablePerson/list", deleteRsData);
     }

@@ -22,7 +22,7 @@ public class LikeablePersonService {
 
     @Transactional
     public RsData<LikeablePerson> like(Member member, String username, int attractiveTypeCode) {
-        if ( member.hasConnectedInstaMember() == false ) {
+        if (member.hasConnectedInstaMember() == false) {
             return RsData.of("F-2", "먼저 본인의 인스타그램 아이디를 입력해야 합니다.");
         }
 
@@ -51,6 +51,13 @@ public class LikeablePersonService {
         toInstaMember.addToLikeablePerson(likeablePerson);
 
         return RsData.of("S-1", "입력하신 인스타유저(%s)를 호감상대로 등록되었습니다.".formatted(username), likeablePerson);
+    }
+
+    @Transactional
+    public RsData<LikeablePerson> update(LikeablePerson likeablePerson, int attractiveTypeCode) {
+        likeablePerson.setAttractiveTypeCode(attractiveTypeCode);
+        likeablePersonRepository.save(likeablePerson); // 저장
+        return RsData.of("S-2", "입력하신 인스타유저(%s)의 코드를 변경하였습니다.".formatted(likeablePerson.getToInstaMemberUsername()), likeablePerson);
     }
 
     public List<LikeablePerson> findByFromInstaMemberId(Long fromInstaMemberId) {
@@ -88,12 +95,15 @@ public class LikeablePersonService {
 
         List<LikeablePerson> LikeablePersonList = instaMember.getFromLikeablePeople();
 
-        if(LikeablePersonList.size() >= 10)
+        if (LikeablePersonList.size() >= 10)
             return RsData.of("F-2", "한 명이 11개 이상 등록할 수 없습니다.");
 
-        for(LikeablePerson likeablePerson:LikeablePersonList){
-            if(likeablePerson.getToInstaMemberUsername().equals(username))
+        for (LikeablePerson likeablePerson : LikeablePersonList) {
+            if (likeablePerson.getToInstaMemberUsername().equals(username)){
+                if (likeablePerson.getAttractiveTypeCode() != attractiveTypeCode)
+                    return RsData.of("S-2", "변경 가능합니다.", likeablePerson);
                 return RsData.of("F-1", "중복입니다.");
+            }
         }
 
         return RsData.of("S-1", "추가 가능합니다.");
