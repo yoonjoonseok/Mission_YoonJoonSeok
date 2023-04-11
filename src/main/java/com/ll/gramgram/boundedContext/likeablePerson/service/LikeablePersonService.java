@@ -78,6 +78,14 @@ public class LikeablePersonService {
         return RsData.of("S-1", "추가 가능합니다.");
     }
 
+    public List<LikeablePerson> findByFromInstaMemberId(Long fromInstaMemberId) {
+        return likeablePersonRepository.findByFromInstaMemberId(fromInstaMemberId);
+    }
+
+    public Optional<LikeablePerson> findById(Long id) {
+        return likeablePersonRepository.findById(id);
+    }
+
     @Transactional
     public RsData delete(LikeablePerson likeablePerson) {
         String toInstaMemberUsername = likeablePerson.getToInstaMember().getUsername();
