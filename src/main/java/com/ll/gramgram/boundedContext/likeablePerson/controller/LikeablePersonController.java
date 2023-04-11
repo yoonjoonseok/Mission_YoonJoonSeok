@@ -41,25 +41,20 @@ public class LikeablePersonController {
     public String add(@Valid AddForm addForm) {
         RsData canActorDeleteRsData = likeablePersonService.canActorAdd(rq.getMember(), addForm.getUsername(), addForm.getAttractiveTypeCode());
 
-        if (canActorDeleteRsData.isFail()) {
+        if (canActorDeleteRsData.isFail())
             return rq.historyBack(canActorDeleteRsData);
-        } else if (canActorDeleteRsData.getResultCode().equals("S-2")) {
-            RsData updateRsData = likeablePersonService.update((LikeablePerson) canActorDeleteRsData.getData(), addForm.getAttractiveTypeCode());
 
-            if (updateRsData.isFail()) {
-                return rq.historyBack(updateRsData);
-            }
+        RsData<LikeablePerson> likeRsData;
 
-            return rq.redirectWithMsg("/likeablePerson/list", updateRsData);
-        }
+        if (canActorDeleteRsData.getResultCode().equals("S-1"))
+            likeRsData = likeablePersonService.like(rq.getMember(), addForm.getUsername(), addForm.getAttractiveTypeCode());
+        else
+            likeRsData = likeablePersonService.likeablePersonUpdate((LikeablePerson) canActorDeleteRsData.getData(), addForm.getAttractiveTypeCode());
 
-        RsData<LikeablePerson> createRsData = likeablePersonService.like(rq.getMember(), addForm.getUsername(), addForm.getAttractiveTypeCode());
+        if (likeRsData.isFail())
+            return rq.historyBack(likeRsData);
 
-        if (createRsData.isFail()) {
-            return rq.historyBack(createRsData);
-        }
-
-        return rq.redirectWithMsg("/likeablePerson/list", createRsData);
+        return rq.redirectWithMsg("/likeablePerson/list", likeRsData);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -84,11 +79,13 @@ public class LikeablePersonController {
 
         RsData canActorDeleteRsData = likeablePersonService.canActorDelete(rq.getMember(), likeablePerson);
 
-        if (canActorDeleteRsData.isFail()) return rq.historyBack(canActorDeleteRsData);
+        if (canActorDeleteRsData.isFail())
+            return rq.historyBack(canActorDeleteRsData);
 
         RsData deleteRsData = likeablePersonService.delete(likeablePerson);
 
-        if (deleteRsData.isFail()) return rq.historyBack(deleteRsData);
+        if (deleteRsData.isFail())
+            return rq.historyBack(deleteRsData);
 
         return rq.redirectWithMsg("/likeablePerson/list", deleteRsData);
     }

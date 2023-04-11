@@ -45,10 +45,16 @@ public class LikeablePersonService {
         return RsData.of("S-1", "입력하신 인스타유저(%s)를 호감상대로 등록되었습니다.".formatted(username), likeablePerson);
     }
 
+    @Transactional
+    public RsData<LikeablePerson> likeablePersonUpdate(LikeablePerson likeablePerson, int attractiveTypeCode) {
+        likeablePerson.setAttractiveTypeCode(attractiveTypeCode);
+        likeablePersonRepository.save(likeablePerson); // 저장
+        return RsData.of("S-2", "입력하신 인스타유저(%s)의 호감이유를 변경하였습니다.".formatted(likeablePerson.getToInstaMemberUsername()), likeablePerson);
+    }
+
     public RsData canActorAdd(Member actor, String username, int attractiveTypeCode) {
         if (actor.hasConnectedInstaMember() == false)
             return RsData.of("F-1", "먼저 본인의 인스타그램 아이디를 입력해야 합니다.");
-
 
         if (actor.getInstaMember().getUsername().equals(username))
             return RsData.of("F-2", "본인을 호감상대로 등록할 수 없습니다.");
@@ -61,7 +67,7 @@ public class LikeablePersonService {
             return RsData.of("F-3", "한 명이 11개 이상 등록할 수 없습니다.");
 
         for (LikeablePerson likeablePerson : LikeablePersonList) {
-            if (likeablePerson.getToInstaMemberUsername().equals(username)){
+            if (likeablePerson.getToInstaMemberUsername().equals(username)) {
                 if (likeablePerson.getAttractiveTypeCode() != attractiveTypeCode)
                     return RsData.of("S-2", "변경 가능합니다.", likeablePerson);
                 return RsData.of("F-4", "중복입니다.");
@@ -69,13 +75,6 @@ public class LikeablePersonService {
         }
 
         return RsData.of("S-1", "추가 가능합니다.");
-    }
-
-    @Transactional
-    public RsData<LikeablePerson> update(LikeablePerson likeablePerson, int attractiveTypeCode) {
-        likeablePerson.setAttractiveTypeCode(attractiveTypeCode);
-        likeablePersonRepository.save(likeablePerson); // 저장
-        return RsData.of("S-2", "입력하신 인스타유저(%s)의 코드를 변경하였습니다.".formatted(likeablePerson.getToInstaMemberUsername()), likeablePerson);
     }
 
     public List<LikeablePerson> findByFromInstaMemberId(Long fromInstaMemberId) {
