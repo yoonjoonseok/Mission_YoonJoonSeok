@@ -63,9 +63,6 @@ public class LikeablePersonService {
 
         List<LikeablePerson> LikeablePersonList = instaMember.getFromLikeablePeople();
 
-        if (LikeablePersonList.size() >= 10)
-            return RsData.of("F-3", "한 명이 11개 이상 등록할 수 없습니다.");
-
         Optional<LikeablePerson> likeablePerson = LikeablePersonList.stream()
                 .filter(s -> s.getToInstaMemberUsername().equals(username)).findFirst();
 
@@ -75,15 +72,10 @@ public class LikeablePersonService {
             return RsData.of("F-4", "중복입니다.");
         }
 
+        if (LikeablePersonList.size() >= 10)
+            return RsData.of("F-3", "한 명이 11개 이상 등록할 수 없습니다.");
+
         return RsData.of("S-1", "추가 가능합니다.");
-    }
-
-    public List<LikeablePerson> findByFromInstaMemberId(Long fromInstaMemberId) {
-        return likeablePersonRepository.findByFromInstaMemberId(fromInstaMemberId);
-    }
-
-    public Optional<LikeablePerson> findById(Long id) {
-        return likeablePersonRepository.findById(id);
     }
 
     @Transactional
