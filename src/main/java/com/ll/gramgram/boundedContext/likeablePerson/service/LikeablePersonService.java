@@ -66,12 +66,13 @@ public class LikeablePersonService {
         if (LikeablePersonList.size() >= 10)
             return RsData.of("F-3", "한 명이 11개 이상 등록할 수 없습니다.");
 
-        for (LikeablePerson likeablePerson : LikeablePersonList) {
-            if (likeablePerson.getToInstaMemberUsername().equals(username)) {
-                if (likeablePerson.getAttractiveTypeCode() != attractiveTypeCode)
-                    return RsData.of("S-2", "변경 가능합니다.", likeablePerson);
-                return RsData.of("F-4", "중복입니다.");
-            }
+        Optional<LikeablePerson> likeablePerson = LikeablePersonList.stream()
+                .filter(s -> s.getToInstaMemberUsername().equals(username)).findFirst();
+
+        if(likeablePerson.isPresent()){
+            if(likeablePerson.get().getAttractiveTypeCode() != attractiveTypeCode)
+                return RsData.of("S-2", "변경 가능합니다.", likeablePerson.get());
+            return RsData.of("F-4", "중복입니다.");
         }
 
         return RsData.of("S-1", "추가 가능합니다.");
