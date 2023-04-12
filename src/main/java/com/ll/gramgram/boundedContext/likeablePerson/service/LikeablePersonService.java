@@ -1,5 +1,6 @@
 package com.ll.gramgram.boundedContext.likeablePerson.service;
 
+import com.ll.gramgram.base.appConfig.AppConfig;
 import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.instaMember.service.InstaMemberService;
@@ -72,7 +73,7 @@ public class LikeablePersonService {
             return RsData.of("F-4", "중복입니다.");
         }
 
-        if (LikeablePersonList.size() >= 10)
+        if (LikeablePersonList.size() >= AppConfig.getLikeablePersonFromMax())
             return RsData.of("F-3", "한 명이 11개 이상 등록할 수 없습니다.");
 
         return RsData.of("S-1", "추가 가능합니다.");
@@ -95,7 +96,7 @@ public class LikeablePersonService {
 
         int size = likeablePersonRepository.countByFromInstaMemberId(actor.getInstaMember().getId());
 
-        if (size >= 10)
+        if (size >= AppConfig.getLikeablePersonFromMax())
             return RsData.of("F-3", "한 명이 11개 이상 등록할 수 없습니다.");
 
         return RsData.of("S-1", "추가 가능합니다.");
