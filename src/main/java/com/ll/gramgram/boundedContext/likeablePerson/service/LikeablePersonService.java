@@ -93,7 +93,7 @@ public class LikeablePersonService {
             return RsData.of("F-4", "중복입니다.");
         }
 
-        Long size = likeablePersonRepository.countByFromInstaMemberId(actor.getInstaMember().getId());
+        int size = likeablePersonRepository.countByFromInstaMemberId(actor.getInstaMember().getId());
 
         if (size >= 10)
             return RsData.of("F-3", "한 명이 11개 이상 등록할 수 없습니다.");
