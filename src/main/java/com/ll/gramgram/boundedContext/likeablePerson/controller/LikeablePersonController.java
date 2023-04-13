@@ -39,22 +39,12 @@ public class LikeablePersonController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/add")
     public String add(@Valid AddForm addForm) {
-        RsData canActorDeleteRsData = likeablePersonService.canActorAdd(rq.getMember(), addForm.getUsername(), addForm.getAttractiveTypeCode());
+        RsData<LikeablePerson> createRsData = likeablePersonService.like(rq.getMember(), addForm.getUsername(), addForm.getAttractiveTypeCode());
 
-        if (canActorDeleteRsData.isFail())
-            return rq.historyBack(canActorDeleteRsData);
+        if (createRsData.isFail())
+            return rq.historyBack(createRsData);
 
-        RsData<LikeablePerson> likeRsData;
-
-        if (canActorDeleteRsData.getResultCode().equals("S-1"))
-            likeRsData = likeablePersonService.like(rq.getMember(), addForm.getUsername(), addForm.getAttractiveTypeCode());
-        else
-            likeRsData = likeablePersonService.likeablePersonUpdate((LikeablePerson) canActorDeleteRsData.getData(), addForm.getAttractiveTypeCode());
-
-        if (likeRsData.isFail())
-            return rq.historyBack(likeRsData);
-
-        return rq.redirectWithMsg("/likeablePerson/list", likeRsData);
+        return rq.redirectWithMsg("/likeablePerson/list", createRsData);
     }
 
     @PreAuthorize("isAuthenticated()")
