@@ -48,20 +48,26 @@ public class LikeablePersonService {
 
     @Transactional
     public RsData<LikeablePerson> likeablePersonUpdate(LikeablePerson likeablePerson, int attractiveTypeCode) {
-        LikeablePerson likeablePerson2 = LikeablePerson
+        String toInstaMemberUsername = likeablePerson.getToInstaMemberUsername();
+
+        LikeablePerson newLikeablePerson = LikeablePerson
                 .builder()
                 .id(likeablePerson.getId())
                 .createDate(likeablePerson.getCreateDate())
                 .fromInstaMember(likeablePerson.getFromInstaMember()) // 호감을 표시하는 사람의 인스타 멤버
                 .fromInstaMemberUsername(likeablePerson.getFromInstaMemberUsername()) // 중요하지 않음
                 .toInstaMember(likeablePerson.getToInstaMember()) // 호감을 받는 사람의 인스타 멤버
-                .toInstaMemberUsername(likeablePerson.getToInstaMemberUsername()) // 중요하지 않음
+                .toInstaMemberUsername(toInstaMemberUsername) // 중요하지 않음
                 .attractiveTypeCode(attractiveTypeCode) // 1=외모, 2=능력, 3=성격
                 .build();
 
-        likeablePersonRepository.save(likeablePerson2); // 저장
+        String oldAttractiveTypeDisplayName = likeablePerson.getAttractiveTypeDisplayName();
 
-        return RsData.of("S-2", "입력하신 인스타유저(%s)의 호감이유를 변경하였습니다.".formatted(likeablePerson.getToInstaMemberUsername()), likeablePerson);
+        likeablePersonRepository.save(newLikeablePerson); // 저장
+
+        String newAttractiveTypeDisplayName = newLikeablePerson.getAttractiveTypeDisplayName();
+
+        return RsData.of("S-2", "입력하신 인스타유저(%s)의 호감이유를 %s에서 %s로 변경하였습니다.".formatted(toInstaMemberUsername, oldAttractiveTypeDisplayName, newAttractiveTypeDisplayName), likeablePerson);
     }
 
     public RsData canActorAdd(Member actor, String username, int attractiveTypeCode) {
@@ -76,8 +82,8 @@ public class LikeablePersonService {
         Optional<LikeablePerson> likeablePerson = LikeablePersonList.stream()
                 .filter(lp -> lp.getToInstaMemberUsername().equals(username)).findFirst();
 
-        if(likeablePerson.isPresent()){
-            if(likeablePerson.get().getAttractiveTypeCode() != attractiveTypeCode)
+        if (likeablePerson.isPresent()) {
+            if (likeablePerson.get().getAttractiveTypeCode() != attractiveTypeCode)
                 return RsData.of("S-2", "변경 가능합니다.", likeablePerson.get());
             return RsData.of("F-4", "중복입니다.");
         }
