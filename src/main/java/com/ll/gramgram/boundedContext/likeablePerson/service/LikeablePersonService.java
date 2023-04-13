@@ -48,8 +48,18 @@ public class LikeablePersonService {
 
     @Transactional
     public RsData<LikeablePerson> likeablePersonUpdate(LikeablePerson likeablePerson, int attractiveTypeCode) {
-        likeablePerson.setAttractiveTypeCode(attractiveTypeCode);
-        likeablePersonRepository.save(likeablePerson); // 저장
+        LikeablePerson likeablePerson2 = LikeablePerson
+                .builder()
+                .id(likeablePerson.getId())
+                .createDate(likeablePerson.getCreateDate())
+                .fromInstaMember(likeablePerson.getFromInstaMember()) // 호감을 표시하는 사람의 인스타 멤버
+                .fromInstaMemberUsername(likeablePerson.getFromInstaMemberUsername()) // 중요하지 않음
+                .toInstaMember(likeablePerson.getToInstaMember()) // 호감을 받는 사람의 인스타 멤버
+                .toInstaMemberUsername(likeablePerson.getToInstaMemberUsername()) // 중요하지 않음
+                .attractiveTypeCode(attractiveTypeCode) // 1=외모, 2=능력, 3=성격
+                .build();
+
+        likeablePersonRepository.save(likeablePerson2); // 저장
 
         return RsData.of("S-2", "입력하신 인스타유저(%s)의 호감이유를 변경하였습니다.".formatted(likeablePerson.getToInstaMemberUsername()), likeablePerson);
     }
