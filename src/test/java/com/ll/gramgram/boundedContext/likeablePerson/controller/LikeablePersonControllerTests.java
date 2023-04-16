@@ -216,4 +216,76 @@ public class LikeablePersonControllerTests {
 
         assertThat(likeablePersonService.findById(1L).isPresent()).isEqualTo(true);
     }
+
+    @Test
+    @DisplayName("등록 폼 처리(user3가 insta_user4에게 호감표시(외모), 중복이므로 등록되어서는 안 됨)")
+    @WithUserDetails("user3")
+    void t009() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(post("/likeablePerson/add")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("username", "insta_user4")
+                        .param("attractiveTypeCode", "1")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("add"))
+                .andExpect(status().is4xxClientError())
+        ;
+    }
+
+    @Test
+    @DisplayName("등록 폼 처리(한명의 인스타회원이 11명 이상의 호감상대를 등록 할 수 없음)")
+    @WithUserDetails("user3")
+    void t010() throws Exception {
+        for (int i = 5; i < 13; i++) {
+            mvc
+                    .perform(post("/likeablePerson/add")
+                            .with(csrf()) // CSRF 키 생성
+                            .param("username", "insta_user" + i)
+                            .param("attractiveTypeCode", "1")
+                    )
+                    .andDo(print());
+        }
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(post("/likeablePerson/add")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("username", "insta_user13")
+                        .param("attractiveTypeCode", "1")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("add"))
+                .andExpect(status().is4xxClientError())
+        ;
+    }
+
+    @Test
+    @DisplayName("등록 폼 처리(기존의 사유와 다른 사유로 호감을 표시하는 경우에는 성공으로 처리)")
+    @WithUserDetails("user3")
+    void t011() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(post("/likeablePerson/add")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("username", "insta_user4")
+                        .param("attractiveTypeCode", "2")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("add"))
+                .andExpect(status().is3xxRedirection())
+        ;
+    }
 }

@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @Transactional(readOnly = true)
@@ -33,11 +35,24 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         String providerTypeCode = userRequest.getClientRegistration().getRegistrationId().toUpperCase();
 
+        if(providerTypeCode.equals("NAVER"))
+            oauthId = splitID(oauthId);
+
         String username = providerTypeCode + "__%s".formatted(oauthId);
 
         Member member = memberService.whenSocialLogin(providerTypeCode, username).getData();
 
         return new CustomOAuth2User(member.getUsername(), member.getPassword(), member.getGrantedAuthorities());
+    }
+
+    private String splitID(String oauthId){
+        Pattern pattern = Pattern.compile("id=(.*?),");
+        Matcher matcher = pattern.matcher(oauthId);
+
+        if(matcher.find())
+            return matcher.group(1);
+
+        return oauthId;
     }
 }
 
