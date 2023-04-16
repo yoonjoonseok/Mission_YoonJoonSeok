@@ -43,7 +43,7 @@ public class LikeablePersonService {
                 .attractiveTypeCode(attractiveTypeCode) // 1=외모, 2=능력, 3=성격
                 .build();
 
-        //likeablePersonRepository.save(likeablePerson); // 저장
+        likeablePersonRepository.save(likeablePerson); // 저장
 
         // 너가 좋아하는 호감표시 생겼어.
         fromInstaMember.addFromLikeablePerson(likeablePerson);
@@ -84,7 +84,7 @@ public class LikeablePersonService {
         }
 
         if (LikeablePersonList.size() >= AppConfig.getLikeablePersonFromMax())
-            return RsData.of("F-3", "한 명이 11개 이상 등록할 수 없습니다.");
+            return RsData.of("F-3", "한 명이 %d개 이상 등록할 수 없습니다.".formatted(AppConfig.getLikeablePersonFromMax()));
 
         return RsData.of("S-1", "추가 가능합니다.");
     }
