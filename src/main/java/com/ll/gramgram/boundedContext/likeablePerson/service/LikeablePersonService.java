@@ -97,6 +97,10 @@ public class LikeablePersonService {
         if (actorInstaMemberId != fromInstaMemberId)
             return RsData.of("F-2", "권한이 없습니다.");
 
+        if(likeablePerson.getModifyUnlockDate().isAfter(LocalDateTime.now())) {
+            return RsData.of("F-3", "쿨타임이 지나지 않았습니다.");
+        }
+
         return RsData.of("S-1", "삭제가능합니다.");
     }
 
@@ -128,6 +132,9 @@ public class LikeablePersonService {
         long likeablePersonFromMax = AppConfig.getLikeablePersonFromMax();
 
         if (fromLikeablePerson != null) {
+            if(fromLikeablePerson.getModifyUnlockDate().isAfter(LocalDateTime.now())) {
+                return RsData.of("F-5", "쿨타임이 지나지 않았습니다.");
+            }
             return RsData.of("S-2", "%s님에 대해서 호감표시가 가능합니다.".formatted(username));
         }
 
