@@ -45,7 +45,6 @@ public class Notification extends BaseEntity {
     }
 
     public String getModifyDateDisplay() {
-        String result = "";
         LocalDateTime modifyDate = getModifyDate();
         LocalDateTime now = LocalDateTime.now();
 
@@ -54,8 +53,15 @@ public class Notification extends BaseEntity {
         String day = plusZero(modifyDate.getDayOfMonth());
         String hour = plusZero(modifyDate.getHour());
         String minute = plusZero(modifyDate.getMinute());
+        String between = getBetween(modifyDate,now);
 
-        String between = "";
+        String result = "%d.%s.%s %s:%s, %s".formatted(year,month,day,hour,minute,between);
+
+        return result;
+    }
+
+    private String getBetween(LocalDateTime modifyDate, LocalDateTime now){
+        String between;
         long betweenDay = ChronoUnit.DAYS.between(modifyDate,now);
 
         if (betweenDay != 0)
@@ -69,16 +75,11 @@ public class Notification extends BaseEntity {
                 between = ChronoUnit.MINUTES.between(modifyDate, now) + "분 전";
         }
 
-        result += year + "." + month + "." + day + " " + hour + ":" + minute + ", " + between;
-
-        return result;
+        return between;
     }
 
     private String plusZero(int number) {
-        String result = "" + number;
-        if (number < 10)
-            result = "0" + number;
-        return result;
+        return number < 10 ? "0" + number :  ""+number;
     }
 
     public String getGenderDisplayName(String Gender) {
