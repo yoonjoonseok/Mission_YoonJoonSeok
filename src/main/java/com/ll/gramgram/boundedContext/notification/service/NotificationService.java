@@ -22,36 +22,34 @@ public class NotificationService {
         return notificationRepository.findByToInstaMember(toInstaMember);
     }
 
+    @Transactional
     public void saveLikeNotification(LikeablePerson likeablePerson){
-        Notification notification = Notification
-                .builder()
-                .readDate(null)
-                .toInstaMember(likeablePerson.getToInstaMember())
-                .fromInstaMember(likeablePerson.getFromInstaMember())
-                .typeCode("Like")
-                .oldGender(null)
-                .oldAttractiveTypeCode(0)
-                .newGender(likeablePerson.getFromInstaMember().getGender())
-                .newAttractiveTypeCode(likeablePerson.getAttractiveTypeCode())
-                .build();
+        Notification notification = makeNotification(likeablePerson, "Like", 0);
 
         notificationRepository.save(notification);
     }
 
+    @Transactional
     public void saveModifyNotification(LikeablePerson likeablePerson, int oldAttractiveTypeCode){
+        Notification notification = makeNotification(likeablePerson, "ModifyAttractiveType", oldAttractiveTypeCode);
+
+        notificationRepository.save(notification);
+    }
+
+    private Notification makeNotification(LikeablePerson likeablePerson, String typeCode, int oldAttractiveTypeCode){
         Notification notification = Notification
                 .builder()
                 .readDate(null)
                 .toInstaMember(likeablePerson.getToInstaMember())
                 .fromInstaMember(likeablePerson.getFromInstaMember())
-                .typeCode("ModifyAttractiveType")
+                .typeCode(typeCode)
                 .oldGender(null)
                 .oldAttractiveTypeCode(oldAttractiveTypeCode)
                 .newGender(likeablePerson.getFromInstaMember().getGender())
                 .newAttractiveTypeCode(likeablePerson.getAttractiveTypeCode())
                 .build();
 
-        notificationRepository.save(notification);
+        return notification;
     }
 
     @Transactional
