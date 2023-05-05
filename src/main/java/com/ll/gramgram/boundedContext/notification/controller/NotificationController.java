@@ -21,7 +21,7 @@ import java.util.List;
 public class NotificationController {
     private final Rq rq;
     private final NotificationService notificationService;
-    @Transactional
+
     @GetMapping("/list")
     @PreAuthorize("isAuthenticated()")
     public String showList(Model model) {
@@ -31,12 +31,7 @@ public class NotificationController {
 
         List<Notification> notifications = notificationService.findByToInstaMember(rq.getMember().getInstaMember());
 
-        LocalDateTime now = LocalDateTime.now();
-
-        RsData rsData;
-
-        for(Notification notification:notifications)
-            rsData = notification.updateReadDate(now);
+        notificationService.updateReadDates(notifications);
 
         model.addAttribute("notifications", notifications);
 
