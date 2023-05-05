@@ -136,9 +136,6 @@ public class LikeablePersonService {
         long likeablePersonFromMax = AppConfig.getLikeablePersonFromMax();
 
         if (fromLikeablePerson != null) {
-            if(!fromLikeablePerson.isModifyUnlocked()) {
-                return RsData.of("F-5", "쿨타임이 지나지 않았습니다.");
-            }
             return RsData.of("S-2", "%s님에 대해서 호감표시가 가능합니다.".formatted(username));
         }
 
@@ -214,6 +211,10 @@ public class LikeablePersonService {
     public RsData canModifyLike(Member actor, LikeablePerson likeablePerson) {
         if (!actor.hasConnectedInstaMember()) {
             return RsData.of("F-1", "먼저 본인의 인스타그램 아이디를 입력해주세요.");
+        }
+
+        if(!likeablePerson.isModifyUnlocked()) {
+            return RsData.of("F-3", "쿨타임이 지나지 않았습니다.");
         }
 
         InstaMember fromInstaMember = actor.getInstaMember();
