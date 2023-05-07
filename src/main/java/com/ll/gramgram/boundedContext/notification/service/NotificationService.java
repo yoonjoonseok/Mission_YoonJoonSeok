@@ -23,20 +23,16 @@ public class NotificationService {
     }
 
     @Transactional
-    public void saveLikeNotification(LikeablePerson likeablePerson){
-        Notification notification = makeNotification(likeablePerson, "Like", 0);
-
-        notificationRepository.save(notification);
+    public RsData<Notification> saveLikeNotification(LikeablePerson likeablePerson){
+        return make(likeablePerson, "Like", 0);
     }
 
     @Transactional
-    public void saveModifyNotification(LikeablePerson likeablePerson, int oldAttractiveTypeCode){
-        Notification notification = makeNotification(likeablePerson, "ModifyAttractiveType", oldAttractiveTypeCode);
-
-        notificationRepository.save(notification);
+    public RsData<Notification> saveModifyNotification(LikeablePerson likeablePerson, int oldAttractiveTypeCode){
+        return make(likeablePerson, "ModifyAttractiveType", oldAttractiveTypeCode);
     }
 
-    private Notification makeNotification(LikeablePerson likeablePerson, String typeCode, int oldAttractiveTypeCode){
+    private RsData<Notification> make(LikeablePerson likeablePerson, String typeCode, int oldAttractiveTypeCode){
         Notification notification = Notification
                 .builder()
                 .readDate(null)
@@ -49,15 +45,18 @@ public class NotificationService {
                 .newAttractiveTypeCode(likeablePerson.getAttractiveTypeCode())
                 .build();
 
-        return notification;
+        notificationRepository.save(notification);
+
+        return RsData.of("S-1", "알림 메세지가 생성되었습니다.", notification);
     }
 
     @Transactional
-    public void updateReadDates(List<Notification> notifications){
-        LocalDateTime now = LocalDateTime.now();
+    public RsData updateReadDates(List<Notification> notifications){
+        notifications
+                .stream()
+                .filter(notification -> !notification.isRead())
+                .forEach(Notification::markAsRead);
 
-        RsData rsData;
-        for(Notification notification:notifications)
-            rsData = notification.updateReadDate(now);
+        return RsData.of("S-1", "읽음 처리 되었습니다.");
     }
 }

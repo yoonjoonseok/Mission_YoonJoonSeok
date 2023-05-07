@@ -36,12 +36,12 @@ public class Notification extends BaseEntity {
     private String newGender; // 해당사항 없으면 null
     private int newAttractiveTypeCode; // 해당사항 없으면 0
 
-    public RsData updateReadDate(LocalDateTime localDateTime) {
-        if(this.readDate != null)
-            return RsData.of("F-1", "이미 읽었습니다.");
+    public boolean isRead() {
+        return readDate != null;
+    }
 
-        this.readDate = localDateTime;
-        return RsData.of("S-1", "성공");
+    public void markAsRead() {
+        readDate = LocalDateTime.now();
     }
 
     public String getModifyDateDisplay() {
