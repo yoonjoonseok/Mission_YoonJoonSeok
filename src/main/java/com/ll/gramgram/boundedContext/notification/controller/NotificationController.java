@@ -1,15 +1,18 @@
 package com.ll.gramgram.boundedContext.notification.controller;
 
 import com.ll.gramgram.base.rq.Rq;
+import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.notification.entity.Notification;
 import com.ll.gramgram.boundedContext.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
@@ -27,6 +30,8 @@ public class NotificationController {
         }
 
         List<Notification> notifications = notificationService.findByToInstaMember(rq.getMember().getInstaMember());
+
+        notificationService.updateReadDates(notifications);
 
         model.addAttribute("notifications", notifications);
 
