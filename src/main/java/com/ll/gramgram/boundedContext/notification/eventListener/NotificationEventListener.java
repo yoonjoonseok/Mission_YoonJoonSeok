@@ -21,13 +21,13 @@ public class NotificationEventListener {
     public void listen(EventAfterLike event) {
         LikeablePerson likeablePerson = event.getLikeablePerson();
 
-        notificationService.saveLikeNotification(likeablePerson);
+        notificationService.makeLike(likeablePerson);
     }
 
     @EventListener
     public void listen(EventAfterModifyAttractiveType event) {
         LikeablePerson likeablePerson = event.getLikeablePerson();
 
-        notificationService.saveModifyNotification(likeablePerson, event.getOldAttractiveTypeCode());
+        notificationService.makeModifyAttractive(likeablePerson, event.getOldAttractiveTypeCode());
     }
 }

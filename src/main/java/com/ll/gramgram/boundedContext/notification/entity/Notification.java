@@ -1,20 +1,16 @@
 package com.ll.gramgram.boundedContext.notification.entity;
 
-import com.ll.gramgram.base.appConfig.AppConfig;
 import com.ll.gramgram.base.baseEntity.BaseEntity;
-import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
+import com.ll.gramgram.standard.util.Ut;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.temporal.ChronoUnit;
 
 @Entity
 @Getter
@@ -22,7 +18,6 @@ import java.time.temporal.ChronoUnit;
 @SuperBuilder
 @ToString(callSuper = true)
 public class Notification extends BaseEntity {
-
     private LocalDateTime readDate;
     @ManyToOne
     @ToString.Exclude
@@ -44,62 +39,35 @@ public class Notification extends BaseEntity {
         readDate = LocalDateTime.now();
     }
 
+    public String getCreateDateAfterStrHuman() {
+        return Ut.time.diffFormat1Human(LocalDateTime.now(), getCreateDate());
+    }
+
     public boolean isHot() {
         // 만들어진지 60분이 안되었다면 hot 으로 설정
         return getCreateDate().isAfter(LocalDateTime.now().minusMinutes(60));
     }
 
-    public String getModifyDateDisplay() {
-        LocalDateTime modifyDate = getModifyDate();
-        LocalDateTime now = LocalDateTime.now();
-
-        int year = modifyDate.getYear() % 100;
-        String month = plusZero(modifyDate.getMonth().getValue());
-        String day = plusZero(modifyDate.getDayOfMonth());
-        String hour = plusZero(modifyDate.getHour());
-        String minute = plusZero(modifyDate.getMinute());
-        String between = getBetween(modifyDate,now);
-
-        String result = "%d.%s.%s %s:%s, %s".formatted(year,month,day,hour,minute,between);
-
-        return result;
-    }
-
-    private String getBetween(LocalDateTime modifyDate, LocalDateTime now){
-        String between;
-        long betweenDay = ChronoUnit.DAYS.between(modifyDate,now);
-
-        if (betweenDay != 0)
-            between = betweenDay + "일 전";
-        else {
-            long betweenHour = ChronoUnit.HOURS.between(modifyDate, now);
-
-            if (betweenHour != 0)
-                between = betweenHour + "시간 전";
-            else
-                between = ChronoUnit.MINUTES.between(modifyDate, now) + "분 전";
-        }
-
-        return between;
-    }
-
-    private String plusZero(int number) {
-        return number < 10 ? "0" + number :  ""+number;
-    }
-
-    public String getGenderDisplayName(String Gender) {
-        return switch (Gender) {
-            case "W" -> "여자";
-            case "M" -> "남자";
-            default -> "넌바이너리";
-        };
-    }
-
-    public String getAttractiveTypeDisplayName(int attractiveTypeCode) {
-        return switch (attractiveTypeCode) {
+    public String getOldAttractiveTypeDisplayName() {
+        return switch (oldAttractiveTypeCode) {
             case 1 -> "외모";
             case 2 -> "성격";
             default -> "능력";
+        };
+    }
+
+    public String getNewAttractiveTypeDisplayName() {
+        return switch (newAttractiveTypeCode) {
+            case 1 -> "외모";
+            case 2 -> "성격";
+            default -> "능력";
+        };
+    }
+
+    public String getNewGenderDisplayName() {
+        return switch (newGender) {
+            case "W" -> "여성";
+            default -> "남성";
         };
     }
 }

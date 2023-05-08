@@ -172,7 +172,6 @@ public class LikeablePersonControllerTests {
         ResultActions resultActions = mvc
                 .perform(post("/usr/likeablePerson/modify/2")
                         .with(csrf()) // CSRF 키 생성
-                        .param("username", "abcd")
                         .param("attractiveTypeCode", "3")
                 )
                 .andDo(print());
@@ -393,76 +392,45 @@ public class LikeablePersonControllerTests {
     }
 
     @Test
-    @DisplayName("호감표시 후, 개별 호감표시건에 대해서, 3시간 동안은 호감취소와 호감사유변경을 할 수 없다")
+    @DisplayName("호감취소는 쿨타임이 지나야 가능하다.")
     @WithUserDetails("user3")
     void t016() throws Exception {
-        mvc.perform(post("/usr/likeablePerson/like")
-                        .with(csrf()) // CSRF 키 생성
-                        .param("username", "bts")
-                        .param("attractiveTypeCode", "3")
-                )
-                .andDo(print());
-
-        ResultActions likeResultActions = mvc
-                .perform(post("/usr/likeablePerson/like")
-                        .with(csrf()) // CSRF 키 생성
-                        .param("username", "bts")
-                        .param("attractiveTypeCode", "2")
-                )
-                .andDo(print());
-
-        likeResultActions
-                .andExpect(handler().handlerType(LikeablePersonController.class))
-                .andExpect(handler().methodName("like"))
-                .andExpect(status().is4xxClientError());
-
-        ResultActions cancelResultActions = mvc
+        // WHEN
+        ResultActions resultActions = mvc
                 .perform(
                         delete("/usr/likeablePerson/3")
                                 .with(csrf())
                 )
                 .andDo(print());
 
-        cancelResultActions
+        // THEN
+        resultActions
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("cancel"))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().is4xxClientError())
+        ;
+
+        assertThat(likeablePersonService.findById(3L).isPresent()).isEqualTo(true);
     }
 
     @Test
-    @DisplayName("호감사유변경 후, 개별 호감표시건에 대해서, 3시간 동안은 호감취소와 호감사유변경을 할 수 없다")
+    @DisplayName("호감사유변경은 쿨타임이 지나야 가능하다.")
     @WithUserDetails("user3")
     void t017() throws Exception {
-        mvc.perform(post("/usr/likeablePerson/like")
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(post("/usr/likeablePerson/modify/3")
                         .with(csrf()) // CSRF 키 생성
-                        .param("username", "insta_user4")
                         .param("attractiveTypeCode", "3")
                 )
                 .andDo(print());
 
-        ResultActions likeResultActions = mvc
-                .perform(post("/usr/likeablePerson/like")
-                        .with(csrf()) // CSRF 키 생성
-                        .param("username", "insta_user4")
-                        .param("attractiveTypeCode", "2")
-                )
-                .andDo(print());
-
-        likeResultActions
+        // THEN
+        resultActions
                 .andExpect(handler().handlerType(LikeablePersonController.class))
-                .andExpect(handler().methodName("like"))
+                .andExpect(handler().methodName("modify"))
                 .andExpect(status().is4xxClientError());
 
-        ResultActions cancelResultActions = mvc
-                .perform(
-                        delete("/usr/likeablePerson/1")
-                                .with(csrf())
-                )
-                .andDo(print());
-
-        cancelResultActions
-                .andExpect(handler().handlerType(LikeablePersonController.class))
-                .andExpect(handler().methodName("cancel"))
-                .andExpect(status().is4xxClientError());
+        assertThat(likeablePersonService.findById(3L).get().getAttractiveTypeCode()).isEqualTo(2);
     }
 }

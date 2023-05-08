@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -19,30 +18,29 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
 
     public List<Notification> findByToInstaMember(InstaMember toInstaMember) {
-        return notificationRepository.findByToInstaMember(toInstaMember);
+        return notificationRepository.findByToInstaMemberOrderByIdDesc(toInstaMember);
     }
 
     @Transactional
-    public RsData<Notification> saveLikeNotification(LikeablePerson likeablePerson){
-        return make(likeablePerson, "Like", 0);
+    public RsData<Notification> makeLike(LikeablePerson likeablePerson) {
+        return make(likeablePerson, "LIKE", 0, null);
     }
 
     @Transactional
-    public RsData<Notification> saveModifyNotification(LikeablePerson likeablePerson, int oldAttractiveTypeCode){
-        return make(likeablePerson, "ModifyAttractiveType", oldAttractiveTypeCode);
+    public RsData<Notification> makeModifyAttractive(LikeablePerson likeablePerson, int oldAttractiveTypeCode) {
+        return make(likeablePerson, "MODIFY_ATTRACTIVE_TYPE", oldAttractiveTypeCode, likeablePerson.getFromInstaMember().getGender());
     }
 
-    private RsData<Notification> make(LikeablePerson likeablePerson, String typeCode, int oldAttractiveTypeCode){
+    private RsData<Notification> make(LikeablePerson likeablePerson, String typeCode, int oldAttractiveTypeCode, String oldGender) {
         Notification notification = Notification
                 .builder()
-                .readDate(null)
+                .typeCode(typeCode)
                 .toInstaMember(likeablePerson.getToInstaMember())
                 .fromInstaMember(likeablePerson.getFromInstaMember())
-                .typeCode(typeCode)
-                .oldGender(null)
                 .oldAttractiveTypeCode(oldAttractiveTypeCode)
-                .newGender(likeablePerson.getFromInstaMember().getGender())
+                .oldGender(oldGender)
                 .newAttractiveTypeCode(likeablePerson.getAttractiveTypeCode())
+                .newGender(likeablePerson.getFromInstaMember().getGender())
                 .build();
 
         notificationRepository.save(notification);
@@ -50,8 +48,12 @@ public class NotificationService {
         return RsData.of("S-1", "알림 메세지가 생성되었습니다.", notification);
     }
 
+    public List<Notification> findByToInstaMember_username(String username) {
+        return notificationRepository.findByToInstaMember_usernameOrderByIdDesc(username);
+    }
+
     @Transactional
-    public RsData updateReadDates(List<Notification> notifications){
+    public RsData markAsRead(List<Notification> notifications) {
         notifications
                 .stream()
                 .filter(notification -> !notification.isRead())
