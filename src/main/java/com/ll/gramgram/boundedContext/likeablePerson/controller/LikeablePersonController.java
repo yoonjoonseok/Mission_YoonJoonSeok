@@ -130,15 +130,14 @@ public class LikeablePersonController {
         if (instaMember != null) {
             // 해당 인스타회원이 좋아하는 사람들 목록
             List<LikeablePerson> likeablePeople = instaMember.getToLikeablePeople();
-            List<LikeablePerson> filteredLikeablePeople;
 
-            filteredLikeablePeople = likeablePeople
+            likeablePeople = likeablePeople
                     .stream()
                     .filter(likeablePerson -> gender.isEmpty() || likeablePerson.getFromInstaMember().getGender().equals(gender)) //성별 필터링
                     .filter(likeablePerson -> attractiveTypeCode == null || likeablePerson.getAttractiveTypeCode() == attractiveTypeCode) //호감사유 필터링
                     .collect(Collectors.toList());
 
-            model.addAttribute("likeablePeople", filteredLikeablePeople);
+            model.addAttribute("likeablePeople", likeablePeople);
         }
 
         return "usr/likeablePerson/toList";
