@@ -15,10 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/usr/likeablePerson")
@@ -133,11 +130,11 @@ public class LikeablePersonController {
             // 해당 인스타회원이 좋아하는 사람들 목록
             List<LikeablePerson> likeablePeople = instaMember.getToLikeablePeople();
 
-            likeablePersonService.filter(likeablePeople, gender, attractiveTypeCode);
+            List<LikeablePerson> filteredLikeablePeople = likeablePersonService.filter(likeablePeople, gender, attractiveTypeCode);
 
-            likeablePersonService.sort(likeablePeople, sortCode);
+            likeablePersonService.sort(filteredLikeablePeople, sortCode);
 
-            model.addAttribute("likeablePeople", likeablePeople);
+            model.addAttribute("likeablePeople", filteredLikeablePeople);
         }
 
         return "usr/likeablePerson/toList";
