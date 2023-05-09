@@ -15,6 +15,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -123,7 +125,7 @@ public class LikeablePersonController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/toList")
-    public String showToList(Model model, @RequestParam(value = "gender", required = false, defaultValue = "") String gender, @RequestParam(value = "attractiveTypeCode", required = false) Integer attractiveTypeCode, @RequestParam(value = "sortCode", required = false) Integer sortCode) {
+    public String showToList(Model model, @RequestParam(value = "gender", required = false, defaultValue = "") String gender, @RequestParam(value = "attractiveTypeCode", required = false, defaultValue = "0") int attractiveTypeCode, @RequestParam(value = "sortCode", required = false, defaultValue = "1") int sortCode) {
         InstaMember instaMember = rq.getMember().getInstaMember();
 
         // 인스타인증을 했는지 체크
@@ -133,9 +135,45 @@ public class LikeablePersonController {
 
             likeablePeople = likeablePeople
                     .stream()
-                    .filter(likeablePerson -> gender.isEmpty() || likeablePerson.getFromInstaMember().getGender().equals(gender)) //성별 필터링
-                    .filter(likeablePerson -> attractiveTypeCode == null || likeablePerson.getAttractiveTypeCode() == attractiveTypeCode) //호감사유 필터링
+                    .filter(l -> gender.isEmpty() || l.getFromInstaMember().getGender().equals(gender)) //성별 필터링
+                    .filter(l -> attractiveTypeCode == 0 || l.getAttractiveTypeCode() == attractiveTypeCode) //호감사유 필터링
                     .collect(Collectors.toList());
+
+
+            switch (sortCode) {
+                //날짜순
+                case 2: {
+                    Collections.reverse(likeablePeople);
+                    break;
+                }
+                //인기 많은 순
+                case 3: {
+                    int[] countAttractiveTypeCode = new int[3];
+                    likeablePeople.stream().forEach(l -> countAttractiveTypeCode[l.getAttractiveTypeCode()-1]++);
+                    Collections.sort(likeablePeople, Comparator.comparingInt(l -> countAttractiveTypeCode[l.getAttractiveTypeCode()-1]*-1));
+                    break;
+                }
+                //인기 적은 순
+                case 4: {
+                    int[] countAttractiveTypeCode = new int[3];
+                    likeablePeople.stream().forEach(l -> countAttractiveTypeCode[l.getAttractiveTypeCode()-1]++);
+                    Collections.sort(likeablePeople, Comparator.comparingInt(l -> countAttractiveTypeCode[l.getAttractiveTypeCode()-1]));
+                    break;
+                }
+                //성별순
+                case 5: {
+                    Collections.sort(likeablePeople, Comparator.comparingInt(l -> l.getFromInstaMember().getGenderInt()));
+                    break;
+                }
+                //호감사유순
+                case 6: {
+                    Collections.sort(likeablePeople, Comparator.comparingInt(l -> l.getAttractiveTypeCode()));
+                    break;
+                }
+                //최신순(기본)
+                default:
+                    break;
+            }
 
             model.addAttribute("likeablePeople", likeablePeople);
         }
