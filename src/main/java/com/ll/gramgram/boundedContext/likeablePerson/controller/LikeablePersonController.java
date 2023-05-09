@@ -133,47 +133,9 @@ public class LikeablePersonController {
             // 해당 인스타회원이 좋아하는 사람들 목록
             List<LikeablePerson> likeablePeople = instaMember.getToLikeablePeople();
 
-            likeablePeople = likeablePeople
-                    .stream()
-                    .filter(l -> gender.isEmpty() || l.getFromInstaMember().getGender().equals(gender)) //성별 필터링
-                    .filter(l -> attractiveTypeCode == 0 || l.getAttractiveTypeCode() == attractiveTypeCode) //호감사유 필터링
-                    .collect(Collectors.toList());
+            likeablePersonService.filter(likeablePeople, gender, attractiveTypeCode);
 
-
-            switch (sortCode) {
-                //날짜순
-                case 2: {
-                    Collections.reverse(likeablePeople);
-                    break;
-                }
-                //인기 많은 순
-                case 3: {
-                    int[] countAttractiveTypeCode = new int[3];
-                    likeablePeople.stream().forEach(l -> countAttractiveTypeCode[l.getAttractiveTypeCode()-1]++);
-                    Collections.sort(likeablePeople, Comparator.comparingInt(l -> countAttractiveTypeCode[l.getAttractiveTypeCode()-1]*-1));
-                    break;
-                }
-                //인기 적은 순
-                case 4: {
-                    int[] countAttractiveTypeCode = new int[3];
-                    likeablePeople.stream().forEach(l -> countAttractiveTypeCode[l.getAttractiveTypeCode()-1]++);
-                    Collections.sort(likeablePeople, Comparator.comparingInt(l -> countAttractiveTypeCode[l.getAttractiveTypeCode()-1]));
-                    break;
-                }
-                //성별순
-                case 5: {
-                    Collections.sort(likeablePeople, Comparator.comparingInt(l -> l.getFromInstaMember().getGenderInt()));
-                    break;
-                }
-                //호감사유순
-                case 6: {
-                    Collections.sort(likeablePeople, Comparator.comparingInt(l -> l.getAttractiveTypeCode()));
-                    break;
-                }
-                //최신순(기본)
-                default:
-                    break;
-            }
+            likeablePersonService.sort(likeablePeople, sortCode);
 
             model.addAttribute("likeablePeople", likeablePeople);
         }
