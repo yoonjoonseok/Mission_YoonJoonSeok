@@ -233,16 +233,13 @@ public class LikeablePersonService {
             case 2 -> {
                 Collections.reverse(likeablePeople);
             }
-            //인기 많은 순(3) & 인기 적은 순(4)
-            case 3, 4 -> {
-                int[] countAttractiveTypeCode = new int[3];
-
-                likeablePeople.forEach(l -> countAttractiveTypeCode[l.getAttractiveTypeCode() - 1]++);
-
-                if (sortCode == 3)
-                    likeablePeople.sort(Comparator.comparingInt(l -> countAttractiveTypeCode[l.getAttractiveTypeCode() - 1] * -1));
-                else
-                    likeablePeople.sort(Comparator.comparingInt(l -> countAttractiveTypeCode[l.getAttractiveTypeCode() - 1]));
+            //인기 많은 순(3)
+            case 3 -> {
+                Comparator.comparing((LikeablePerson l) -> l.getFromInstaMember().getLikes()).reversed();
+            }
+            //인기 적은 순(4)
+            case 4 -> {
+                Comparator.comparing((LikeablePerson l) -> l.getFromInstaMember().getLikes());
             }
             //성별순
             case 5 -> {

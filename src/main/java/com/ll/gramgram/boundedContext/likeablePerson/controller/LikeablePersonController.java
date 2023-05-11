@@ -122,7 +122,7 @@ public class LikeablePersonController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/toList")
-    public String showToList(Model model, @RequestParam(value = "gender", required = false, defaultValue = "") String gender, @RequestParam(value = "attractiveTypeCode", required = false, defaultValue = "0") int attractiveTypeCode, @RequestParam(value = "sortCode", required = false, defaultValue = "1") int sortCode) {
+    public String showToList(Model model, @RequestParam(required = false, defaultValue = "") String gender, @RequestParam(required = false, defaultValue = "0") int attractiveTypeCode, @RequestParam(required = false, defaultValue = "1") int sortCode) {
         InstaMember instaMember = rq.getMember().getInstaMember();
 
         // 인스타인증을 했는지 체크
