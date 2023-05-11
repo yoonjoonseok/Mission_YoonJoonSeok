@@ -246,7 +246,7 @@ public class LikeablePersonService {
             }
             //성별순
             case 5 -> {
-                likeablePeople.sort(Comparator.comparingInt(l -> l.getFromInstaMember().getGenderInt()));
+                likeablePeople.sort(Comparator.comparing((LikeablePerson l) -> l.getFromInstaMember().getGender()).reversed());
             }
             //호감사유순
             case 6 -> {
