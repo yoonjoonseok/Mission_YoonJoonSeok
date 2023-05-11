@@ -15,9 +15,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -218,5 +217,41 @@ public class LikeablePersonService {
 
 
         return RsData.of("S-1", "호감사유변경이 가능합니다.");
+    }
+
+    public List<LikeablePerson> filter(List<LikeablePerson> likeablePeople, String gender, int attractiveTypeCode) {
+        return likeablePeople
+                .stream()
+                .filter(l -> gender.isEmpty() || l.getFromInstaMember().getGender().equals(gender)) //성별 필터링
+                .filter(l -> attractiveTypeCode == 0 || l.getAttractiveTypeCode() == attractiveTypeCode) //호감사유 필터링
+                .collect(Collectors.toList());
+    }
+
+    public void sort(List<LikeablePerson> likeablePeople, int sortCode) {
+        switch (sortCode) {
+            //날짜순
+            case 2 -> {
+                Collections.reverse(likeablePeople);
+            }
+            //인기 많은 순(3)
+            case 3 -> {
+                Comparator.comparing((LikeablePerson l) -> l.getFromInstaMember().getLikes()).reversed();
+            }
+            //인기 적은 순(4)
+            case 4 -> {
+                Comparator.comparing((LikeablePerson l) -> l.getFromInstaMember().getLikes());
+            }
+            //성별순
+            case 5 -> {
+                likeablePeople.sort(Comparator.comparing((LikeablePerson l) -> l.getFromInstaMember().getGender()).reversed());
+            }
+            //호감사유순
+            case 6 -> {
+                likeablePeople.sort(Comparator.comparingInt(LikeablePerson::getAttractiveTypeCode));
+            }
+            //최신순(기본)
+            default -> {
+            }
+        }
     }
 }
